@@ -1,4 +1,6 @@
-import { Suspense } from "react";
+"use client";
+
+import { useState, useEffect } from "react";
 import { getUserAccounts } from "@/actions/dashboard";
 import { getDashboardData } from "@/actions/dashboard";
 import { getCurrentBudget } from "@/actions/budget";
@@ -6,21 +8,84 @@ import { AccountCard } from "./_components/account-card";
 import { CreateAccountDrawer } from "@/components/create-account-drawer";
 import { BudgetProgress } from "./_components/budget-progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { DashboardOverview } from "./_components/transaction-overview";
 
-export default async function DashboardPage() {
-  const [accounts, transactions] = await Promise.all([
-    getUserAccounts(),
-    getDashboardData(),
-  ]);
+export default function DashboardPage() {
+  const [accounts, setAccounts] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [budgetData, setBudgetData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const defaultAccount = accounts?.find((account) => account.isDefault);
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Fetch accounts and transactions
+        const [accountsData, transactionsData] = await Promise.all([
+          getUserAccounts().catch(err => {
+            console.error("Error fetching accounts:", err);
+            return [];
+          }),
+          getDashboardData().catch(err => {
+            console.error("Error fetching transactions:", err);
+            return [];
+          }),
+        ]);
 
-  // Get budget for default account
-  let budgetData = null;
-  if (defaultAccount) {
-    budgetData = await getCurrentBudget(defaultAccount.id);
+        setAccounts(accountsData || []);
+        setTransactions(transactionsData || []);
+
+        // Get default account and budget
+        const defaultAccount = accountsData?.find((account) => account.isDefault);
+        if (defaultAccount) {
+          try {
+            const budget = await getCurrentBudget(defaultAccount.id);
+            setBudgetData(budget);
+          } catch (err) {
+            console.error("Error fetching budget:", err);
+          }
+        }
+      } catch (err) {
+        console.error("Dashboard data error:", err);
+        setError("Failed to load dashboard data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-700 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+        <div className="flex items-center text-red-700 mb-4">
+          <AlertCircle className="mr-2" size={20} />
+          <h3 className="font-medium">Error Loading Dashboard</h3>
+        </div>
+        <p className="text-gray-700">{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+        >
+          Retry
+        </button>
+      </div>
+    );
   }
 
   return (

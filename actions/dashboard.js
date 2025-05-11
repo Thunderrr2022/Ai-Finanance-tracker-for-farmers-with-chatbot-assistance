@@ -1,10 +1,10 @@
 "use server";
 
-import aj from "@/lib/arcjet";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
-import { request } from "@arcjet/next";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import aj from "@/lib/arcjet";
+import { request } from "@arcjet/next";
 
 const serializeTransaction = (obj) => {
   const serialized = { ...obj };
@@ -17,19 +17,56 @@ const serializeTransaction = (obj) => {
   return serialized;
 };
 
-export async function getUserAccounts() {
-  const { userId } = await auth();
-  if (!userId) throw new Error("Unauthorized");
+// Helper function to get or create user
+async function getOrCreateUser(userId) {
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
 
-  const user = await db.user.findUnique({
+  let user = await db.user.findUnique({
     where: { clerkUserId: userId },
   });
 
   if (!user) {
-    throw new Error("User not found");
+    try {
+      // Get user data from Clerk
+      const clerkUser = await clerkClient.users.getUser(userId);
+      
+      if (!clerkUser) {
+        throw new Error("Clerk user not found");
+      }
+
+      const email = clerkUser.emailAddresses?.[0]?.emailAddress;
+      
+      if (!email) {
+        throw new Error("User email not found");
   }
 
+      // Create user in database
+      user = await db.user.create({
+        data: {
+          clerkUserId: userId,
+          email: email,
+          name: `${clerkUser.firstName || ''} ${clerkUser.lastName || ''}`.trim() || 'New User',
+          imageUrl: clerkUser.imageUrl,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw new Error(`Failed to create user: ${error.message}`);
+    }
+  }
+
+  return user;
+}
+
+export async function getUserAccounts() {
+  const { userId } = await auth();
+  if (!userId) throw new Error("Unauthorized");
+
   try {
+    const user = await getOrCreateUser(userId);
+
     const accounts = await db.account.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: "desc" },
@@ -48,6 +85,7 @@ export async function getUserAccounts() {
     return serializedAccounts;
   } catch (error) {
     console.error(error.message);
+    throw error;
   }
 }
 
@@ -62,7 +100,7 @@ export async function createAccount(data) {
     // Check rate limit
     const decision = await aj.protect(req, {
       userId,
-      requested: 1, // Specify how many tokens to consume
+      requested: 1,
     });
 
     if (decision.isDenied()) {
@@ -82,13 +120,7 @@ export async function createAccount(data) {
       throw new Error("Request blocked");
     }
 
-    const user = await db.user.findUnique({
-      where: { clerkUserId: userId },
-    });
-
-    if (!user) {
-      throw new Error("User not found");
-    }
+    const user = await getOrCreateUser(userId);
 
     // Convert balance to float before saving
     const balanceFloat = parseFloat(data.balance);
@@ -120,7 +152,7 @@ export async function createAccount(data) {
         ...data,
         balance: balanceFloat,
         userId: user.id,
-        isDefault: shouldBeDefault, // Override the isDefault based on our logic
+        isDefault: shouldBeDefault,
       },
     });
 
@@ -138,13 +170,8 @@ export async function getDashboardData() {
   const { userId } = await auth();
   if (!userId) throw new Error("Unauthorized");
 
-  const user = await db.user.findUnique({
-    where: { clerkUserId: userId },
-  });
-
-  if (!user) {
-    throw new Error("User not found");
-  }
+  try {
+    const user = await getOrCreateUser(userId);
 
   // Get all user transactions
   const transactions = await db.transaction.findMany({
@@ -153,4 +180,8 @@ export async function getDashboardData() {
   });
 
   return transactions.map(serializeTransaction);
+  } catch (error) {
+    console.error(error.message);
+    throw error;
+  }
 }

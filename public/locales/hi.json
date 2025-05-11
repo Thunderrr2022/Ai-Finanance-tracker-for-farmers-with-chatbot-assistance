@@ -1,0 +1,49 @@
+{
+  "common": {
+    "dashboard": "डैशबोर्ड",
+    "account": "खाता",
+    "transactions": "लेनदेन",
+    "addTransaction": "लेनदेन जोड़ें",
+    "settings": "सेटिंग्स",
+    "logout": "लॉगआउट",
+    "login": "लॉगिन",
+    "language": "भाषा",
+    "features": "विशेषताएँ",
+    "testimonials": "प्रशंसापत्र"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "totalBalance": "कुल शेष",
+    "income": "आय",
+    "expenses": "खर्च",
+    "budget": "बजट",
+    "recentTransactions": "हालिया लेनदेन",
+    "viewAll": "सभी देखें",
+    "accountSummary": "खाता सारांश",
+    "budgetOverview": "बजट अवलोकन"
+  },
+  "transactions": {
+    "date": "तारीख",
+    "description": "विवरण",
+    "amount": "राशि",
+    "category": "श्रेणी",
+    "type": "प्रकार",
+    "income": "आय",
+    "expense": "व्यय",
+    "transfer": "स्थानांतरण",
+    "noTransactions": "कोई लेनदेन नहीं मिला"
+  },
+  "account": {
+    "balance": "शेष",
+    "accountName": "खाता नाम",
+    "accountType": "खाता प्रकार",
+    "addAccount": "खाता जोड़ें",
+    "editAccount": "खाता संपादित करें"
+  },
+  "farmAssistant": {
+    "title": "कृषि सहायक",
+    "askQuestion": "फसलों, उपकरणों, या अपने ऋण के पैसे का उपयोग कैसे करें, इसके बारे में पूछें...",
+    "send": "भेजें",
+    "loading": "टाइप कर रहा है..."
+  }
+} 

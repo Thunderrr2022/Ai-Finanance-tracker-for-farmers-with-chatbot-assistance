@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "./ui/button";
 import { PenBox, LayoutDashboard } from "lucide-react";
@@ -5,9 +7,11 @@ import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 import Image from "next/image";
+import LanguageSelector from "./LanguageSelector";
+import { useLanguage } from "@/context/LanguageContext";
 
-const Header = async () => {
-  await checkUser();
+const Header = () => {
+  const { t } = useLanguage();
 
   return (
     <header className="fixed top-0 w-full bg-white/80 backdrop-blur-md z-50 border-b">
@@ -26,19 +30,21 @@ const Header = async () => {
         <div className="hidden md:flex items-center space-x-8">
           <SignedOut>
             <a href="#features" className="text-gray-600 hover:text-blue-600">
-              Features
+              {t('common.features')}
             </a>
             <a
               href="#testimonials"
               className="text-gray-600 hover:text-blue-600"
             >
-              Testimonials
+              {t('common.testimonials')}
             </a>
           </SignedOut>
         </div>
 
         {/* Action Buttons */}
         <div className="flex items-center space-x-4">
+          <LanguageSelector />
+          
           <SignedIn>
             <Link
               href="/dashboard"
@@ -46,19 +52,19 @@ const Header = async () => {
             >
               <Button variant="outline">
                 <LayoutDashboard size={18} />
-                <span className="hidden md:inline">Dashboard</span>
+                <span className="hidden md:inline">{t('common.dashboard')}</span>
               </Button>
             </Link>
             <a href="/transaction/create">
               <Button className="flex items-center gap-2">
                 <PenBox size={18} />
-                <span className="hidden md:inline">Add Transaction</span>
+                <span className="hidden md:inline">{t('common.addTransaction')}</span>
               </Button>
             </a>
           </SignedIn>
           <SignedOut>
             <SignInButton forceRedirectUrl="/dashboard">
-              <Button variant="outline">Login</Button>
+              <Button variant="outline">{t('common.login')}</Button>
             </SignInButton>
           </SignedOut>
           <SignedIn>

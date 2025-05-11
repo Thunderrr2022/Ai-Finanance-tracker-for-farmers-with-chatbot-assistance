@@ -1,0 +1,49 @@
+{
+  "common": {
+    "dashboard": "Dashboard",
+    "account": "Account",
+    "transactions": "Transactions",
+    "addTransaction": "Add Transaction",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "language": "Language",
+    "features": "Features",
+    "testimonials": "Testimonials"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalBalance": "Total Balance",
+    "income": "Income",
+    "expenses": "Expenses",
+    "budget": "Budget",
+    "recentTransactions": "Recent Transactions",
+    "viewAll": "View All",
+    "accountSummary": "Account Summary",
+    "budgetOverview": "Budget Overview"
+  },
+  "transactions": {
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "category": "Category",
+    "type": "Type",
+    "income": "Income",
+    "expense": "Expense",
+    "transfer": "Transfer",
+    "noTransactions": "No transactions found"
+  },
+  "account": {
+    "balance": "Balance",
+    "accountName": "Account Name",
+    "accountType": "Account Type",
+    "addAccount": "Add Account",
+    "editAccount": "Edit Account"
+  },
+  "farmAssistant": {
+    "title": "Farm Assistant",
+    "askQuestion": "Ask about crops, tools, or how to use your loan money...",
+    "send": "Send",
+    "loading": "Typing..."
+  }
+} 

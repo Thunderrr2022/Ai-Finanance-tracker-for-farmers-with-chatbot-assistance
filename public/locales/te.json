@@ -1,0 +1,49 @@
+{
+  "common": {
+    "dashboard": "డాష్‌బోర్డ్",
+    "account": "ఖాతా",
+    "transactions": "లావాదేవీలు",
+    "addTransaction": "లావాదేవీని జోడించండి",
+    "settings": "సెట్టింగ్‌లు",
+    "logout": "లాగౌట్",
+    "login": "లాగిన్",
+    "language": "భాష",
+    "features": "ఫీచర్లు",
+    "testimonials": "టెస్టిమోనియల్స్"
+  },
+  "dashboard": {
+    "title": "డాష్‌బోర్డ్",
+    "totalBalance": "మొత్తం బ్యాలెన్స్",
+    "income": "ఆదాయం",
+    "expenses": "ఖర్చులు",
+    "budget": "బడ్జెట్",
+    "recentTransactions": "ఇటీవలి లావాదేవీలు",
+    "viewAll": "అన్నీ చూడండి",
+    "accountSummary": "ఖాతా సారాంశం",
+    "budgetOverview": "బడ్జెట్ ఓవర్‌వ్యూ"
+  },
+  "transactions": {
+    "date": "తేదీ",
+    "description": "వివరణ",
+    "amount": "మొత్తం",
+    "category": "వర్గం",
+    "type": "రకం",
+    "income": "ఆదాయం",
+    "expense": "ఖర్చు",
+    "transfer": "బదిలీ",
+    "noTransactions": "లావాదేవీలు కనుగొనబడలేదు"
+  },
+  "account": {
+    "balance": "బ్యాలెన్స్",
+    "accountName": "ఖాతా పేరు",
+    "accountType": "ఖాతా రకం",
+    "addAccount": "ఖాతాను జోడించండి",
+    "editAccount": "ఖాతాను సవరించండి"
+  },
+  "farmAssistant": {
+    "title": "వ్యవసాయ సహాయకుడు",
+    "askQuestion": "పంటలు, పరికరాలు లేదా మీ రుణ డబ్బును ఎలా ఉపయోగించాలో అడగండి...",
+    "send": "పంపండి",
+    "loading": "టైప్ చేస్తోంది..."
+  }
+} 

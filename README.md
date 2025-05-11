@@ -1,24 +1,121 @@
-# Full Stack AI Fianace Platform with Next JS, Supabase, Tailwind, Prisma, Inngest, ArcJet, Shadcn UI Tutorial 🔥🔥
-## https://youtu.be/egS6fnZAdzk
+# AI Finance Platform
 
-<img width="1470" alt="Screenshot 2024-12-10 at 9 45 45 AM" src="https://github.com/user-attachments/assets/1bc50b85-b421-4122-8ba4-ae68b2b61432">
+A modern, AI-powered financial management platform built with Next.js, Clerk, and Prisma. This platform helps users manage their finances smarter with the help of artificial intelligence.
 
-### Make sure to create a `.env` file with following variables -
+## 🌟 Features
+
+- **AI-Powered Financial Analysis**: Get intelligent insights and recommendations for your financial decisions
+- **Secure Authentication**: Built-in user authentication and authorization using Clerk
+- **Modern UI/UX**: Beautiful and responsive interface built with Tailwind CSS and Radix UI
+- **Real-time Updates**: Stay informed with live financial data and notifications
+- **Email Notifications**: Integrated email system for important updates and alerts
+- **Dark Mode Support**: Seamless dark/light mode switching
+- **Mobile Responsive**: Fully responsive design for all devices
+
+## 🚀 Tech Stack
+
+- **Framework**: Next.js 15 with App Router
+- **Authentication**: Clerk
+- **Database**: Prisma with PostgreSQL
+- **Styling**: Tailwind CSS
+- **UI Components**: Radix UI
+- **Form Handling**: React Hook Form with Zod validation
+- **Email**: React Email with Resend
+- **Charts**: Recharts
+- **Animations**: Framer Motion
+- **AI Integration**: Google's Generative AI
+
+## 📦 Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/ai-finance-platform.git
+cd ai-finance-platform
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Set up environment variables:
+Create a `.env` file in the root directory with the following variables:
+```env
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+# Database
+DATABASE_URL=your_database_url
+
+# Email (Resend)
+RESEND_API_KEY=your_resend_api_key
+
+# Google AI
+GOOGLE_AI_API_KEY=your_google_ai_api_key
+```
+
+4. Initialize the database:
+```bash
+npx prisma generate
+npx prisma db push
+```
+
+5. Start the development server:
+```bash
+npm run dev
+```
+
+## 🛠️ Available Scripts
+
+- `npm run dev` - Start development server with Turbopack
+- `npm run build` - Build for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run email` - Start email development server
+
+## 📁 Project Structure
 
 ```
-DATABASE_URL=
-DIRECT_URL=
-
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=
-CLERK_SECRET_KEY=
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/onboarding
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/onboarding
-
-GEMINI_API_KEY=
-
-RESEND_API_KEY=
-
-ARCJET_KEY=
+├── app/                 # Next.js app directory
+│   ├── api/            # API routes
+│   ├── (auth)/         # Authentication pages
+│   ├── (main)/         # Main application pages
+│   └── lib/            # Utility functions
+├── components/         # Reusable UI components
+├── context/           # React context providers
+├── data/              # Static data and constants
+├── emails/            # Email templates
+├── hooks/             # Custom React hooks
+├── lib/               # Shared utilities
+├── prisma/            # Database schema and migrations
+└── public/            # Static assets
 ```
+
+## 🔒 Security
+
+- Authentication handled by Clerk
+- Environment variables for sensitive data
+- API rate limiting with Arcjet
+- Secure database connections
+- Protected API routes
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Clerk](https://clerk.com/)
+- [Prisma](https://www.prisma.io/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)

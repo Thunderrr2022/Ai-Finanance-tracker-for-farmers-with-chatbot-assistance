@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import aj from "@/lib/arcjet";
 import { request } from "@arcjet/next";
+import { sendEmail } from "@/actions/send-email";
+import EmailTemplate from "@/emails/template";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -13,6 +15,145 @@ const serializeAmount = (obj) => ({
   ...obj,
   amount: obj.amount.toNumber(),
 });
+
+// Helper function to check if a date is in a new month
+function isNewMonth(date1, date2) {
+  return (
+    date1.getMonth() !== date2.getMonth() ||
+    date1.getFullYear() !== date2.getFullYear()
+  );
+}
+
+// Helper function to check budget alerts
+async function checkBudgetAlert(userId, accountId, amount) {
+  try {
+    // Get user's budget and user data
+    const [budget, user] = await Promise.all([
+      db.budget.findUnique({
+        where: { userId },
+      }),
+      db.user.findUnique({
+        where: { id: userId },
+      }),
+    ]);
+
+    if (!budget || !user) {
+      return;
+    }
+
+    // Get current month's expenses
+    const startDate = new Date();
+    startDate.setDate(1); // Start of current month
+
+    const expenses = await db.transaction.aggregate({
+      where: {
+        userId,
+        accountId,
+        type: "EXPENSE",
+        date: {
+          gte: startDate,
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+    });
+
+    const totalExpenses = expenses._sum.amount?.toNumber() || 0;
+    const budgetAmount = budget.amount.toNumber();
+    const percentageUsed = (totalExpenses / budgetAmount) * 100;
+
+    // Get top spending categories
+    const categoryExpenses = await db.transaction.groupBy({
+      by: ['category'],
+      where: {
+        userId,
+        accountId,
+        type: "EXPENSE",
+        date: {
+          gte: startDate,
+        },
+      },
+      _sum: {
+        amount: true,
+      },
+      orderBy: {
+        _sum: {
+          amount: 'desc',
+        },
+      },
+      take: 3,
+    });
+
+    // Calculate remaining budget and days
+    const remainingBudget = budgetAmount - totalExpenses;
+    const daysInMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0).getDate();
+    const currentDay = new Date().getDate();
+    const daysRemaining = daysInMonth - currentDay;
+    const dailyBudget = budgetAmount / daysInMonth;
+    const projectedExpenses = totalExpenses + (dailyBudget * daysRemaining);
+    const projectedPercentage = (projectedExpenses / budgetAmount) * 100;
+
+    // Check if we should send an alert
+    const shouldSendAlert = (
+      // Send alert if budget is 80% used
+      (percentageUsed >= 80 && percentageUsed < 100) ||
+      // Send alert if projected to exceed budget
+      (projectedPercentage >= 100 && percentageUsed < 100) ||
+      // Send alert if budget is exceeded
+      (percentageUsed >= 100)
+    );
+
+    if (shouldSendAlert && (!budget.lastAlertSent || isNewMonth(new Date(budget.lastAlertSent), new Date()))) {
+      const alertType = percentageUsed >= 100 
+        ? "budget-exceeded" 
+        : projectedPercentage >= 100 
+          ? "budget-projection" 
+          : "budget-warning";
+
+      // Get account name
+      const account = await db.account.findUnique({
+        where: { id: accountId },
+      });
+
+      // Send email alert
+      const emailResult = await sendEmail({
+        to: user.email,
+        subject: `Budget Alert: ${alertType === "budget-exceeded" ? "Budget Exceeded" : "Budget Warning"}`,
+        react: EmailTemplate({
+          userName: user.name || "User",
+          type: "budget-alert",
+          data: {
+            percentageUsed,
+            budgetAmount: budgetAmount.toFixed(2),
+            totalExpenses: totalExpenses.toFixed(2),
+            remainingBudget: remainingBudget.toFixed(2),
+            daysRemaining,
+            projectedExpenses: projectedExpenses.toFixed(2),
+            projectedPercentage: projectedPercentage.toFixed(1),
+            accountName: account?.name || "Default Account",
+            topCategories: categoryExpenses.map(cat => ({
+              name: cat.category,
+              amount: cat._sum.amount.toFixed(2),
+              percentage: ((cat._sum.amount.toNumber() / totalExpenses) * 100).toFixed(1)
+            })),
+            alertType
+          },
+        }),
+      });
+
+      if (emailResult.success) {
+        // Update last alert sent
+        await db.budget.update({
+          where: { id: budget.id },
+          data: { lastAlertSent: new Date() },
+        });
+      }
+    }
+  } catch (error) {
+    console.error("Error in checkBudgetAlert:", error);
+  }
+}
 
 // Create Transaction
 export async function createTransaction(data) {
@@ -26,7 +167,7 @@ export async function createTransaction(data) {
     // Check rate limit
     const decision = await aj.protect(req, {
       userId,
-      requested: 1, // Specify how many tokens to consume
+      requested: 1,
     });
 
     if (decision.isDenied()) {
@@ -90,12 +231,18 @@ export async function createTransaction(data) {
       return newTransaction;
     });
 
+    // Check budget alert if this is an expense
+    if (data.type === "EXPENSE") {
+      await checkBudgetAlert(user.id, data.accountId, data.amount);
+    }
+
     revalidatePath("/dashboard");
-    revalidatePath(`/account/${transaction.accountId}`);
+    revalidatePath(`/account/${data.accountId}`);
 
     return { success: true, data: serializeAmount(transaction) };
   } catch (error) {
-    throw new Error(error.message);
+    console.error("Error creating transaction:", error);
+    return { success: false, error: error.message };
   }
 }
 
@@ -185,8 +332,14 @@ export async function updateTransaction(id, data) {
       return updated;
     });
 
+    // Check budget alert if this is an expense
+    if (data.type === "EXPENSE") {
+      await checkBudgetAlert(user.id, data.accountId, data.amount);
+    }
+
     revalidatePath("/dashboard");
     revalidatePath(`/account/${data.accountId}`);
+    revalidatePath("/api/budget");
 
     return { success: true, data: serializeAmount(transaction) };
   } catch (error) {

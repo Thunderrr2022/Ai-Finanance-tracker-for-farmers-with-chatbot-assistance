@@ -220,3 +220,263 @@ const styles = {
     borderTop: "1px solid #e5e7eb",
   },
 };
+
+const BudgetAlertEmail = ({ data }) => {
+  const {
+    percentageUsed,
+    budgetAmount,
+    totalExpenses,
+    remainingBudget,
+    daysRemaining,
+    projectedExpenses,
+    projectedPercentage,
+    accountName,
+    topCategories,
+    alertType
+  } = data;
+
+  const getAlertColor = () => {
+    switch (alertType) {
+      case "budget-exceeded":
+        return "#EF4444"; // red
+      case "budget-projection":
+        return "#F59E0B"; // amber
+      default:
+        return "#3B82F6"; // blue
+    }
+  };
+
+  const getAlertMessage = () => {
+    switch (alertType) {
+      case "budget-exceeded":
+        return "Your budget has been exceeded!";
+      case "budget-projection":
+        return "You're on track to exceed your budget!";
+      default:
+        return "You're approaching your budget limit!";
+    }
+  };
+
+  return (
+    <div style={containerStyle}>
+      <div style={headerStyle}>
+        <h1 style={{ ...titleStyle, color: getAlertColor() }}>Budget Alert</h1>
+        <p style={subtitleStyle}>{getAlertMessage()}</p>
+      </div>
+
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>Budget Overview</h2>
+        <div style={gridStyle}>
+          <div style={cardStyle}>
+            <h3 style={cardTitleStyle}>Current Usage</h3>
+            <p style={percentageStyle}>{percentageUsed.toFixed(1)}%</p>
+            <div style={progressBarContainerStyle}>
+              <div
+                style={{
+                  ...progressBarStyle,
+                  width: `${Math.min(percentageUsed, 100)}%`,
+                  backgroundColor: getAlertColor(),
+                }}
+              />
+            </div>
+          </div>
+
+          <div style={cardStyle}>
+            <h3 style={cardTitleStyle}>Budget Details</h3>
+            <div style={detailGridStyle}>
+              <div style={detailItemStyle}>
+                <span style={detailLabelStyle}>Total Budget:</span>
+                <span style={detailValueStyle}>${budgetAmount}</span>
+              </div>
+              <div style={detailItemStyle}>
+                <span style={detailLabelStyle}>Spent:</span>
+                <span style={detailValueStyle}>${totalExpenses}</span>
+              </div>
+              <div style={detailItemStyle}>
+                <span style={detailLabelStyle}>Remaining:</span>
+                <span style={detailValueStyle}>${remainingBudget}</span>
+              </div>
+              <div style={detailItemStyle}>
+                <span style={detailLabelStyle}>Days Left:</span>
+                <span style={detailValueStyle}>{daysRemaining}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>Projection</h2>
+        <div style={cardStyle}>
+          <p style={projectionTextStyle}>
+            Based on your current spending rate, you're projected to spend{" "}
+            <span style={{ color: getAlertColor() }}>${projectedExpenses}</span> by the end of the month.
+            This is <span style={{ color: getAlertColor() }}>{projectedPercentage}%</span> of your budget.
+          </p>
+        </div>
+      </div>
+
+      {topCategories.length > 0 && (
+        <div style={sectionStyle}>
+          <h2 style={sectionTitleStyle}>Top Spending Categories</h2>
+          <div style={cardStyle}>
+            <div style={categoryListStyle}>
+              {topCategories.map((category, index) => (
+                <div key={index} style={categoryItemStyle}>
+                  <span style={categoryNameStyle}>{category.name}</span>
+                  <div style={categoryDetailsStyle}>
+                    <span style={categoryAmountStyle}>${category.amount}</span>
+                    <span style={categoryPercentageStyle}>{category.percentage}%</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>Recommended Actions</h2>
+        <div style={cardStyle}>
+          <ul style={actionListStyle}>
+            <li style={actionItemStyle}>Review your recent transactions</li>
+            <li style={actionItemStyle}>Consider reducing spending in top categories</li>
+            <li style={actionItemStyle}>Adjust your budget if needed</li>
+            <li style={actionItemStyle}>Set up additional budget alerts</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style={footerStyle}>
+        <p style={footerTextStyle}>
+          This alert is for your {accountName} account. You can manage your budget settings in the dashboard.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const containerStyle = {
+  // Add appropriate styles for the container
+};
+
+const headerStyle = {
+  // Add appropriate styles for the header
+};
+
+const subtitleStyle = {
+  // Add appropriate styles for the subtitle
+};
+
+const sectionStyle = {
+  // Add appropriate styles for the section
+};
+
+const sectionTitleStyle = {
+  // Add appropriate styles for the section title
+};
+
+const gridStyle = {
+  // Add appropriate styles for the grid
+};
+
+const cardStyle = {
+  // Add appropriate styles for the card
+};
+
+const cardTitleStyle = {
+  // Add appropriate styles for the card title
+};
+
+const detailGridStyle = {
+  // Add appropriate styles for the detail grid
+};
+
+const detailItemStyle = {
+  // Add appropriate styles for the detail item
+};
+
+const detailLabelStyle = {
+  // Add appropriate styles for the detail label
+};
+
+const detailValueStyle = {
+  // Add appropriate styles for the detail value
+};
+
+const percentageStyle = {
+  // Add appropriate styles for the percentage
+};
+
+const progressBarContainerStyle = {
+  // Add appropriate styles for the progress bar container
+};
+
+const progressBarStyle = {
+  // Add appropriate styles for the progress bar
+};
+
+const categoryListStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "12px",
+};
+
+const categoryItemStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  padding: "8px 0",
+  borderBottom: "1px solid #E5E7EB",
+};
+
+const categoryNameStyle = {
+  fontSize: "14px",
+  color: "#374151",
+  fontWeight: "500",
+};
+
+const categoryDetailsStyle = {
+  display: "flex",
+  gap: "16px",
+  alignItems: "center",
+};
+
+const categoryAmountStyle = {
+  fontSize: "14px",
+  color: "#374151",
+  fontWeight: "600",
+};
+
+const categoryPercentageStyle = {
+  fontSize: "14px",
+  color: "#6B7280",
+};
+
+const actionListStyle = {
+  listStyleType: "none",
+  padding: 0,
+  margin: 0,
+};
+
+const actionItemStyle = {
+  marginBottom: "8px",
+  paddingLeft: "20px",
+  position: "relative",
+  fontSize: "14px",
+  color: "#374151",
+};
+
+const projectionTextStyle = {
+  fontSize: "14px",
+  color: "#374151",
+  lineHeight: "1.5",
+};
+
+const footerStyle = {
+  // Add appropriate styles for the footer
+};
+
+const footerTextStyle = {
+  // Add appropriate styles for the footer text
+};
