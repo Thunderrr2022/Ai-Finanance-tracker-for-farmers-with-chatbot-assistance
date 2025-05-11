@@ -44,15 +44,21 @@ Create a `.env` file in the root directory with the following variables:
 # Clerk Authentication
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=sign-up
 
-# Database
+# Database Configuration
 DATABASE_URL=your_database_url
+DIRECT_URL=your_direct_database_url
 
-# Email (Resend)
+# API Keys
+ARCJET_API_KEY=your_arcjet_api_key
+ARCJET_ENV=development
+GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+IPINFO_TOKEN=your_ipinfo_token
+WEATHER_API_KEY=your_weather_api_key
 RESEND_API_KEY=your_resend_api_key
-
-# Google AI
-GOOGLE_AI_API_KEY=your_google_ai_api_key
 ```
 
 4. Initialize the database:
